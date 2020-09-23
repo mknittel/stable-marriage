@@ -51,17 +51,15 @@ public class BinaryAgent
     }
 
     // Creates an agent with preferences read from an input file
-    public BinaryAgent(int n, int id, int side, double threshold, String lineWithPrefs)
+    public BinaryAgent(int n, int id, int side, String lineWithPrefs)
     {
         this.n = n;
         this.id = id;
         this.side = side;
 
-		int num_selected = (int) Math.round(threshold * n);
-
         interestList = new ArrayList<Integer>();
         String[] tokens = lineWithPrefs.split("\\s+");
-        for (int j = 0; j < num_selected; j++) interestList.add(Integer.parseInt(tokens[j]));
+        for (int j = 0; j < tokens.length; j++) interestList.add(Integer.parseInt(tokens[j]));
 
 		inverseInterests = new int[n];
 		for (int j = 0; j < n; j++) {

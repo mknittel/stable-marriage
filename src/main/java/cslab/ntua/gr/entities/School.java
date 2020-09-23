@@ -48,15 +48,13 @@ public class School extends BinaryAgent
     }
 
     // Creates an agent with preferences read from an input file
-    public School(int n, int id, int side, double threshold, double affiliateThreshold, String lineWithPrefs, String lineWithAffiliatePrefs)
+    public School(int n, int id, int side, String lineWithPrefs, String lineWithAffiliatePrefs)
     {
-		super(n, id, side, threshold, lineWithPrefs);
-
-		int num_selected = (int) Math.round(affiliateThreshold * n);
+		super(n, id, side, lineWithPrefs);
 
         affiliateInterestList = new ArrayList<Integer>();
         String[] tokens = lineWithAffiliatePrefs.split("\\s+");
-        for (int j = 0; j < num_selected; j++) affiliateInterestList.add(Integer.parseInt(tokens[j]));
+        for (int j = 0; j < tokens.length; j++) affiliateInterestList.add(Integer.parseInt(tokens[j]));
 
         inverseAffiliateInterests = new int[n];
         for (int j = 0; j < n; j++) {
