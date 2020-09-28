@@ -1,13 +1,14 @@
 package cslab.ntua.gr.entities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class BinaryAgent
 {
     private int n, side, id;
-    private List<Integer> interestList; // list of all interested agents
-    private int[] inverseInterests; // binary vector, ith index is acceptability of ith agent
+    private int[] interestList;
 
     // Creates a copy of an existing agent
     public BinaryAgent(BinaryAgent copy)
@@ -16,13 +17,9 @@ public class BinaryAgent
         this.id = copy.getID();
         this.side = copy.getSide();
 
-        interestList = new ArrayList<Integer>();
-        List<Integer> old_interestList = copy.getInterests();
-        for (int j = 0; j < n; j++) interestList.add(old_interestList.get(j));
-
-        inverseInterests = new int[n];
-        int[] old_inverseInterests = copy.getInvInterests();
-        for (int j = 0; j < n; j++) inverseInterests[j] = old_inverseInterests[j];
+        interestList = new int[n];
+        int[] old_interestList = copy.getInterests();
+        for (int j = 0; j < n; j++) interestList[j] = old_interestList[j];
     }
 
     // Creates an agent with random preferences (uniform), number selected = threshold * n
@@ -32,20 +29,14 @@ public class BinaryAgent
         this.id = id;
         this.side = side;
 
-		int num_selected = (int) Math.round(threshold * n);
+		Random r = new Random();
 
-        interestList = new ArrayList<Integer>();
-        for (int j = 0; j < n; j++) interestList.add(j);
-        java.util.Collections.shuffle(interestList);
-		interestList.subList(0, num_selected);
-		
-
-        inverseInterests = new int[n];
+        interestList = new int[n];
         for (int j = 0; j < n; j++) {
-			if (interestList.contains(j)) {
-				inverseInterests[j] = 1;
+			if (r.nextDouble() < threshold) {
+				interestList[j] = 1;
 			} else {
-				inverseInterests[j] = 0;
+				interestList[j] = 0;
 			}
 		}
     }
@@ -57,48 +48,20 @@ public class BinaryAgent
         this.id = id;
         this.side = side;
 
-        interestList = new ArrayList<Integer>();
+        interestList = new int[n];
         String[] tokens = lineWithPrefs.split("\\s+");
-        for (int j = 0; j < tokens.length; j++) interestList.add(Integer.parseInt(tokens[j]));
-
-		inverseInterests = new int[n];
-		for (int j = 0; j < n; j++) {
-			if (interestList.contains(j)) {
-				inverseInterests[j] = 1;
-			} else {
-				inverseInterests[j] = 0;
-			}
-		}
+		System.out.println(Arrays.toString(tokens));
+        for (int j = 0; j < tokens.length; j++) interestList[j] = Integer.parseInt(tokens[j]);
     }
 
-    public int checkAgent(int agentNo)
+    public boolean checkAgent(int agentNo)
     {
-        if (interestList.contains(agentNo)) {
-			return 1;
-		} else {
-			return 0;
-		}
+		return this.interestList[agentNo] == 1;
     }
 
-	// Is a STRICTLY preferable to b?
-    public boolean cmp(int a, int b)
-    {
-        if (inverseInterests[a] < inverseInterests[b]) return true;
-        else return false;
-    }
-
-    /*public boolean prefers_first(Integer a, int b)
-    {
-        if (a == null) return false;
-        if (b == Integer.MAX_VALUE) return true;
-
-        if (inversePrefs[Integer.valueOf(a)] < inversePrefs[b]) return true;
-        else return false;        
-    }*/
 
     public int getN(){ return n; }
     public int getID(){ return id; }
     public int getSide(){ return side; }
-    public List<Integer> getInterests(){ return interestList; }
-    public int[] getInvInterests(){ return inverseInterests; }
+    public int[] getInterests(){ return interestList; }
 }

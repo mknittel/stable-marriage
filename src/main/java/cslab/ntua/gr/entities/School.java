@@ -2,27 +2,23 @@ package cslab.ntua.gr.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import cslab.ntua.gr.entities.BinaryAgent;
 
 public class School extends BinaryAgent
 {
     private int n, side, id;
-    private List<Integer> affiliateInterestList; // list of all interested schools for affiliate
-    private int[] inverseAffiliateInterests; // binary vector, ith index is acceptability of ith school for affiliate
+    private int[] affiliateInterestList;
 
     // Creates a copy of an existing agent
     public School(School copy)
     {
 		super(copy);
 
-        affiliateInterestList = new ArrayList<Integer>();
-        List<Integer> old_affiliateInterestList = copy.getAffiliateInterests();
-        for (int j = 0; j < n; j++) affiliateInterestList.add(old_affiliateInterestList.get(j));
-
-        inverseAffiliateInterests = new int[n];
-        int[] old_inverseAffiliateInterests = copy.getInvAffiliateInterests();
-        for (int j = 0; j < n; j++) inverseAffiliateInterests[j] = old_inverseAffiliateInterests[j];
+        affiliateInterestList = new int[n];
+        int[] old_affiliateInterestList = copy.getAffiliateInterests();
+        for (int j = 0; j < n; j++) affiliateInterestList[j] = old_affiliateInterestList[j];
     }
 
     // Creates an agent with random preferences (uniform), number selected = threshold * n
@@ -30,19 +26,14 @@ public class School extends BinaryAgent
     {
 		super(n, id, side, threshold);
 
-		int num_selected = (int) Math.round(affiliateThreshold * n);
+		Random r = new Random();
 
-        affiliateInterestList = new ArrayList<Integer>();
-        for (int j = 0; j < n; j++) affiliateInterestList.add(j);
-        java.util.Collections.shuffle(affiliateInterestList);
-		affiliateInterestList.subList(0, num_selected);
-
-        inverseAffiliateInterests = new int[n];
+        affiliateInterestList = new int[n];
         for (int j = 0; j < n; j++) {
-			if (affiliateInterestList.contains(j)) {
-				inverseAffiliateInterests[j] = 1;
+			if (r.nextDouble() < affiliateThreshold) {
+				affiliateInterestList[j] = 1;
 			} else {
-				inverseAffiliateInterests[j] = 0;
+				affiliateInterestList[j] = 0;
 			}
 		}
     }
@@ -52,36 +43,15 @@ public class School extends BinaryAgent
     {
 		super(n, id, side, lineWithPrefs);
 
-        affiliateInterestList = new ArrayList<Integer>();
+        affiliateInterestList = new int[n];
         String[] tokens = lineWithAffiliatePrefs.split("\\s+");
-        for (int j = 0; j < tokens.length; j++) affiliateInterestList.add(Integer.parseInt(tokens[j]));
-
-        inverseAffiliateInterests = new int[n];
-        for (int j = 0; j < n; j++) {
-			if (affiliateInterestList.contains(j)) {
-				inverseAffiliateInterests[j] = 1;
-			} else {
-				inverseAffiliateInterests[j] = 0;
-			}
-		}
+        for (int j = 0; j < tokens.length; j++) affiliateInterestList[j] = Integer.parseInt(tokens[j]);
     }
 
-    public int checkSchool(int schoolNo)
+    public boolean checkSchool(int schoolNo)
     {
-        if (affiliateInterestList.contains(schoolNo)) {
-			return 1;
-		} else {
-			return 0;
-		}
+		return this.affiliateInterestList[schoolNo] == 1;
     }
 
-	// Is a STRICTLY preferable to b?
-    public boolean cmpSchool(int a, int b)
-    {
-        if (inverseAffiliateInterests[a] < inverseAffiliateInterests[b]) return true;
-        else return false;
-    }
-
-    public List<Integer> getAffiliateInterests(){ return affiliateInterestList; }
-    public int[] getInvAffiliateInterests(){ return inverseAffiliateInterests; }
+    public int[] getAffiliateInterests(){ return affiliateInterestList; }
 }

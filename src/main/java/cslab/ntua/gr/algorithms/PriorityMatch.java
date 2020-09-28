@@ -1,5 +1,7 @@
 package cslab.ntua.gr.algorithms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 
 import org.apache.commons.cli.CommandLine;
@@ -11,8 +13,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import cslab.ntua.gr.entities.BinaryAgent;
-import cslab.ntua.gr.entities.School;
+import cslab.ntua.gr.entities.BipartiteGraph;
 import cslab.ntua.gr.entities.Marriage;
+import cslab.ntua.gr.entities.School;
 import cslab.ntua.gr.tools.Metrics;
 
 public class PriorityMatch extends Abstract_BSM_Algorithm
@@ -35,10 +38,96 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 	
 	public Marriage match()
 	{
-		// placeholder
-		int[][] placehold = new int[1][1];
-		return new Marriage(1, placehold);
+		BipartiteGraph g = new BipartiteGraph(this.n); // base graph, we remove vertices as they are matched
+
+		System.out.println("Graph 0");
+		BipartiteGraph g0 = new BipartiteGraph(g);
+		this.constructSubgraph(g0, 0);
+
+		System.out.println("Graph 1");
+		BipartiteGraph g1 = new BipartiteGraph(g);
+		this.constructSubgraph(g1, 1);
+
+		System.out.println("Graph 2");
+		BipartiteGraph g2 = new BipartiteGraph(g);
+		this.constructSubgraph(g2, 2);
+
+		System.out.println("Graph 3");
+		BipartiteGraph g3 = new BipartiteGraph(g);
+		this.constructSubgraph(g3, 3);
+
+		System.out.println("Graph 4");
+		BipartiteGraph g4 = new BipartiteGraph(g);
+		this.constructSubgraph(g4, 4);
+
+		ArrayList<ArrayList<Integer>> greedy = g.greedyMaximalMatching();
+		int[][] matching = new int[greedy.size()][2];
+		for (int i = 0; i < greedy.size(); i++) {
+			matching[i][0] = greedy.get(i).get(0);
+			matching[i][1] = greedy.get(i).get(1);
+		}
+
+		return new Marriage(this.n, matching);
 	}
+
+
+	public void constructSubgraph(BipartiteGraph g, int graphNum)
+	{
+		for (int i = 0; i < this.n; i++) {
+			System.out.println(Arrays.toString(this.students[i].getInterests()));
+			System.out.println(Arrays.toString(this.schools[i].getInterests()));
+			System.out.println(Arrays.toString(this.schools[i].getAffiliateInterests()));
+
+			for (int j = 0; j < this.n; j++) {
+				switch (graphNum) {
+					case 0 :
+						if (i == j
+							&& this.students[i].checkAgent(j)
+					 		&& this.schools[j].checkAgent(i)
+				   	 		&& this.schools[j].checkSchool(j)) {
+							g.addEdge(i, j);
+							System.out.println("(" + i + "," + j + ")" + " - " + 0);
+						}
+						break;
+					case 1 :
+						if (i != j
+							&& this.students[i].checkAgent(j)
+							&& this.schools[j].checkAgent(i)) {
+							g.addEdge(i, j);
+							System.out.println("(" + i + "," + j + ")" + " - " + 1);
+						}
+						break;
+					case 2 :
+						if (i == j
+							&& this.students[i].checkAgent(j)
+							&& this.schools[j].checkAgent(i)) {
+							g.addEdge(i, j);
+							System.out.println("(" + i + "," + j + ")" + " - " + 2);
+						}
+						break;
+					case 3 :
+						if (i == j
+							&& this.students[i].checkAgent(j)
+							&& this.schools[j].checkSchool(j)) {
+							g.addEdge(i, j);
+							System.out.println("(" + i + "," + j + ")" + " - " + 3);
+						}
+						break;
+					case 4 :
+						if (i != j
+							&& this.schools[i].checkSchool(j)) {
+							g.addEdge(i, j);
+							System.out.println("(" + i + "," + j + ")" + " - " + 4);
+						}
+						break;
+					default :
+						break;
+				}
+			}
+		}
+	}
+
+
 
     /*public Marriage match()
     {
@@ -169,7 +258,13 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
         else v = false;
 
         Abstract_BSM_Algorithm smp = new PriorityMatch(n, studentFile, schoolFile, affiliateFile);
-        //Marriage matching = smp.match();
+        Marriage matching = smp.match();
+
+		//Agent[][] agents = new Agent[1][n];
+		//for (int i = 0; i < n; i++) {
+		//	agents[0][i] = new Agent(n, i, 
+
+		//System.out.println(matching.marriageToStr());
         //Metrics smpMetrics = new Metrics(smp, matching, getFinalName());
         //if (v) smpMetrics.perform_checks();  
         //smpMetrics.printPerformance();
