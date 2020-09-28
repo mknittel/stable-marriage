@@ -1,114 +1,130 @@
 package cslab.ntua.gr.entities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 public class BipartiteGraph
 {
-	public int n; // Number of vertices in each partition
-	public ArrayList<int[]> edges;
-	public ArrayList<ArrayList<ArrayList<Integer>>> neighbors;
+	protected ArrayList<BinaryAgent> students;
+	protected ArrayList<School> schools;
+	protected HashMap<Integer, BinaryAgent> studentIDs;
+	protected HashMap<Integer, School> schoolIDs;
+	protected HashMap<Integer, ArrayList<School>> studentNeighbors;
+	protected HashMap<Integer, ArrayList<BinaryAgent>> schoolNeighbors;	
 
-    public BipartiteGraph(int n) 
+	// Constructs with n on each side
+    public BipartiteGraph(BinaryAgent[] students, School[] schools) 
     {
-        this.n = n;
-        this.edges = new ArrayList<int[]>();
-		this.neighbors = new ArrayList<ArrayList<ArrayList<Integer>>>();
+		this.students = new ArrayList<BinaryAgent>(Arrays.asList(students));
+		this.schools = new ArrayList<School>(Arrays.asList(schools));
 
-		for (int i = 0; i < n; i++) {
-			this.neighbors.add(new ArrayList<ArrayList<Integer>>());
-			this.neighbors.get(i).add(new ArrayList<Integer>());
-			this.neighbors.get(i).add(new ArrayList<Integer>());
+		this.studentIDs = new HashMap<Integer, BinaryAgent>();
+		this.schoolIDs = new HashMap<Integer, School>();
+
+		this.studentNeighbors = new HashMap<Integer, ArrayList<School>>();
+		this.schoolNeighbors = new HashMap<Integer, ArrayList<BinaryAgent>>();
+
+		for (BinaryAgent student : students) {
+			this.studentIDs.put(student.getID(), student);
+			this.studentNeighbors.put(student.getID(), new ArrayList<School>());
+		}
+
+		for (School school: schools) { 
+			this.schoolIDs.put(school.getID(), school);
+			this.schoolNeighbors.put(school.getID(), new ArrayList<BinaryAgent>());
 		}
     }
 
     // For cloning
     public BipartiteGraph(BipartiteGraph g) 
     {
-        this.n = g.n;
+		this.students = new ArrayList<BinaryAgent>();
+		this.schools = new ArrayList<School>();
 
-		this.edges = new ArrayList<int[]>();
-		for (int i = 0; i < g.edges.size(); i++) {
-			int[] edge = new int[2];
-			edge[0] = g.edges.get(i)[0];
-			edge[1] = g.edges.get(i)[1];
+		this.studentIDs = new HashMap<Integer, BinaryAgent>();
+		this.schoolIDs = new HashMap<Integer, School>();
 
-			this.edges.add(edge);
+		this.studentNeighbors = new HashMap<Integer, ArrayList<School>>();
+		this.schoolNeighbors = new HashMap<Integer, ArrayList<BinaryAgent>>();
+
+		for (BinaryAgent student : g.students) {
+			this.students.add(student);
+			this.studentIDs.put(student.getID(), student);
+			this.studentNeighbors.put(student.getID(), new ArrayList<School>());
+
+			for (School school : g.studentNeighbors.get(student.getID())) {
+				this.studentNeighbors.get(student.getID()).add(school);
+			}
 		}
+		for (School school: g.schools) {
+			this.schools.add(school);
+			this.schoolIDs.put(school.getID(), school);
+			this.schoolNeighbors.put(school.getID(), new ArrayList<BinaryAgent>());
 
-		this.neighbors = new ArrayList<ArrayList<ArrayList<Integer>>>();
-		
-		for (int i = 0; i < n; i++) {
-			this.neighbors.add(new ArrayList<ArrayList<Integer>>());
-
-			for (int j = 0; j < 2; j++) {
-				ArrayList<Integer> vertNeighbors = new ArrayList<Integer>();
-				ArrayList<Integer> old_vertNeighbors = g.neighbors.get(i).get(j);			
-
-				for (int k = 0; k < old_vertNeighbors.size(); k++) {
-					vertNeighbors.add(old_vertNeighbors.get(k));
-				}
-
-				this.neighbors.get(i).add(vertNeighbors);
+			for (BinaryAgent student : g.schoolNeighbors.get(school.getID())) {
+				this.schoolNeighbors.get(school.getID()).add(student);
 			}
 		}
     }
 
-	public void addEdge(int a, int b) // Assumed a is side 0 b is side 1
+	// Intended behavior: if one of the agents is not in the graph, the edge is not created
+	public void addEdge(BinaryAgent student, School school)
 	{
-		if (!(this.neighbors.get(a).get(0).contains(b))) {
-			this.neighbors.get(a).get(0).add(b);
-			this.neighbors.get(b).get(1).add(a);
-			
-			int[] edge = new int[2];
-			edge[0] = a;
-			edge[1] = b;
-			this.edges.add(edge);
+		int a = student.getID();
+		int b = school.getID();
+
+		if (!(this.studentNeighbors.get(a).contains(school))) {
+			this.studentNeighbors.get(a).add(school);
+			this.schoolNeighbors.get(b).add(student);
+		}
+	}
+
+	// Intended behavior: if one of the agents is not in the graph, the edge is not created
+	public void addEdge(int a, int b)
+	{
+		BinaryAgent student = this.studentIDs.get(a);
+		School school = this.schoolIDs.get(b);
+
+		if (this.students.contains(student)
+			&& this.schools.contains(school)
+			&& !(this.studentNeighbors.get(a).contains(school))) {
+			this.studentNeighbors.get(a).add(school);
+			this.schoolNeighbors.get(b).add(student);
 		}
 	}
 
 	public void completeGraph()
 	{
-		for (int i = 0; i < this.n; i++) {
-			for (int j = 0; j < this.n; j++) {
-				this.addEdge(i, j);
-			}
-		}
-	}
-
-	public void randomizeGraph(double p) 
-	{
-		Random r = new Random();
-
-		for (int i = 0; i < this.n; i++) {
-			for (int j = 0; j < this.n; j++) {
-				if (r.nextDouble() < p) {
-					this.addEdge(i, j);
-				}
+		for (BinaryAgent student : this.students) {
+			for (School school : this.schools) {
+				this.addEdge(student, school);
 			}
 		}
 	}
 
 	public ArrayList<ArrayList<Integer>> greedyMaximalMatching() {
-		BipartiteGraph copy = new BipartiteGraph(this);
 		ArrayList<ArrayList<Integer>> matching = new ArrayList<ArrayList<Integer>>();
-		ArrayList<Integer> matched = new ArrayList<Integer>(); // Keep track of matched vertices
+		ArrayList<Integer> matchedStudents = new ArrayList<Integer>();
+		ArrayList<Integer> matchedSchools = new ArrayList<Integer>();
 
-		for (int i = 0; i < this.n; i++) {
-			if (!(matched.contains(i))) {
-				for (Integer neighbor: this.neighbors.get(i).get(0)) {
-					int j = neighbor.intValue();
+		for (BinaryAgent student : this.students) {
+			int studentID = student.getID();
 
-					if (!(matched.contains(j))) {
+			if (!(matchedStudents.contains(studentID))) {
+				for (School school: this.studentNeighbors.get(studentID)) {
+					int schoolID = school.getID();
+
+					if (!(matchedSchools.contains(schoolID))) {
 						ArrayList<Integer> match = new ArrayList<Integer>();
-						match.add(i);
-						match.add(j);
+						match.add(studentID);
+						match.add(schoolID);
 						
 						matching.add(match);
-						matched.add(i);
-						matched.add(j);
+						matchedStudents.add(studentID);
+						matchedSchools.add(schoolID);
 						break;
 					}
 				}
@@ -116,5 +132,75 @@ public class BipartiteGraph
 		}	
 
 		return matching;
+	}
+
+	public void removeMatch(int a, int b) {
+		BinaryAgent student = studentIDs.get(a);
+		School school = schoolIDs.get(b);
+
+		//System.out.println("before");
+		//this.print();
+		this.students.remove(student);
+		this.schools.remove(school);
+		//System.out.println("after");
+		//this.print();
+
+		this.studentIDs.remove(a);
+		this.schoolIDs.remove(b);
+
+		this.studentNeighbors.remove(a);
+		this.schoolNeighbors.remove(b);
+
+		for (BinaryAgent student2 : this.students) {
+			int a2 = student2.getID();
+
+			if (this.studentNeighbors.get(a2).contains(school)) {
+				this.studentNeighbors.get(a2).remove(school);
+				//System.out.println("removing from student neighbors");
+			}
+		}
+
+		for (School school2 : this.schools) {
+			int b2 = school2.getID();
+			//System.out.println("DEBUGGING: b2=" + b2 + " and our school is " + b);
+			//this.print();
+
+			if (this.schoolNeighbors.get(b2).contains(student)) {
+				this.schoolNeighbors.get(b2).remove(student);
+			}
+		}
+	}
+
+	public void removeMatchedVertices(ArrayList<ArrayList<Integer>> matching) {
+		for (ArrayList<Integer> match : matching) {
+			int a = match.get(0);
+			int b = match.get(1);
+
+			this.removeMatch(a, b);
+		}
+	}
+
+	public void print() {
+		String binaryAgents = "Students: ";
+		String schools = "Schools: ";
+		String edges = "Edges: ";
+
+		for (BinaryAgent student : this.students) {
+			int studentID = student.getID();
+			binaryAgents += studentID + ", ";
+
+			for (School school : this.studentNeighbors.get(studentID)) {
+				int schoolID = school.getID();
+				edges += "(" + studentID + ", " + schoolID + "), ";
+			}
+		}
+
+		for (School school : this.schools) {
+			schools += school.getID() + ", ";
+		}
+
+		System.out.println(binaryAgents);
+		System.out.println(schools);
+		System.out.println(edges);
 	}
 }
