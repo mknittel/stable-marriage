@@ -2,6 +2,7 @@ package cslab.ntua.gr.algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Stack;
 
 import org.apache.commons.cli.CommandLine;
@@ -12,7 +13,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import cslab.ntua.gr.entities.BinaryAgent;
+import cslab.ntua.gr.entities.Student;
 import cslab.ntua.gr.entities.BipartiteGraph;
 import cslab.ntua.gr.entities.Marriage;
 import cslab.ntua.gr.entities.School;
@@ -25,15 +26,15 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
     private Stack<Integer> singles;
     private int active_proposer;
 
-    public PriorityMatch(int n, String studentFile, String schoolFile, String affiliateFile)
+    public PriorityMatch(int n, int m, String studentFile, String schoolFile, String affiliateFile)
     {
-        super(n, studentFile, schoolFile, affiliateFile);
+        super(n, m, studentFile, schoolFile, affiliateFile);
     }
 
     // Constructor for when agents are available
-    public PriorityMatch(int n, BinaryAgent[] students, School[] schools)
+    public PriorityMatch(int n, int m, Student[] students, School[] schools)
     {
-        super(n, students, schools);
+        super(n, m, students, schools);
     }
 	
 	public Marriage match()
@@ -47,18 +48,27 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 		this.constructSubgraph(g0, 0);
 		g0.print();
 
-		ArrayList<ArrayList<Integer>> matching0 = g0.greedyMaximalMatching();
-		this.printMatching(matching0);
-		finalMatching.addAll(matching0);
+		HashMap<Integer, ArrayList<ArrayList<Student>>> neighborhoods = new HashMap<Integer, ArrayList<ArrayList<Student>>>();
 
-		g.removeMatchedVertices(matching0);
+		for (School school : this.schools) {
+			int schoolID = school.getID();
+			neighborhoods.put(schoolID, new ArrayList<ArrayList<Student>>());
+			neighborhoods.get(schoolID).add(g0.getSchoolNeighborhood(schoolID));
+		}
+
+		//ArrayList<ArrayList<Integer>> matching0 = g0.greedyMaximalMatching();
+		//this.printMatching(matching0);
+		//finalMatching.addAll(matching0);
+
+		//g.removeMatchedVertices(matching0);
 
 		System.out.println("Graph 1");
 		BipartiteGraph g1 = new BipartiteGraph(g);
 		this.constructSubgraph(g1, 1);
+		g1.addAffiliations(neighborhoods);
 		g1.print();
 
-		ArrayList<ArrayList<Integer>> matching1 = g1.greedyMaximalMatching();
+		ArrayList<ArrayList<Integer>> matching1 = g1.greedyReservedMaximalMatching();
 		this.printMatching(matching1);
 		finalMatching.addAll(matching1);
 
@@ -69,14 +79,71 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 		this.constructSubgraph(g2, 2);
 		g2.print();
 
+		for (School school : g2.getSchools()) {
+			int schoolID = school.getID();
+			neighborhoods.put(schoolID, new ArrayList<ArrayList<Student>>());
+			neighborhoods.get(schoolID).add(g2.getSchoolNeighborhood(schoolID));
+		}
+
+		//ArrayList<ArrayList<Integer>> matching2 = g2.greedyMaximalMatching();
+		//this.printMatching(matching2);
+		//finalMatching.addAll(matching2);
+
+		//g.removeMatchedVertices(matching2);
+
+		System.out.println("Graph 3");
+		BipartiteGraph g3 = new BipartiteGraph(g);
+		this.constructSubgraph(g3, 3);
+		g3.print();
+
+		for (School school : g3.getSchools()) {
+			int schoolID = school.getID();
+			neighborhoods.put(schoolID, new ArrayList<ArrayList<Student>>());
+			neighborhoods.get(schoolID).add(g3.getSchoolNeighborhood(schoolID));
+		}
+
+		//ArrayList<ArrayList<Integer>> matching3 = g3.greedyMaximalMatching();
+		//this.printMatching(matching3);
+		//finalMatching.addAll(matching3);
+
+		//g.removeMatchedVertices(matching3);
+
+		System.out.println("Graph 4");
+		BipartiteGraph g4 = new BipartiteGraph(g);
+		this.constructSubgraph(g4, 4);
+		g4.addAffiliations(neighborhoods);
+		g4.print();
+
+		ArrayList<ArrayList<Integer>> matching4 = g4.greedyReservedMaximalMatching();
+		this.printMatching(matching4);
+		finalMatching.addAll(matching4);
+
+		g.removeMatchedVertices(matching4);
+
+		System.out.println("Graph 0 again");
+		g0 = new BipartiteGraph(g);
+		this.constructSubgraph(g0, 0);
+		g0.print();
+		
+		ArrayList<ArrayList<Integer>> matching0 = g0.greedyMaximalMatching();
+		this.printMatching(matching0);
+		finalMatching.addAll(matching0);
+
+		g.removeMatchedVertices(matching0);
+
+		System.out.println("Graph 2 again");
+		g2 = new BipartiteGraph(g);
+		this.constructSubgraph(g2, 2);
+		g2.print();
+
 		ArrayList<ArrayList<Integer>> matching2 = g2.greedyMaximalMatching();
 		this.printMatching(matching2);
 		finalMatching.addAll(matching2);
 
 		g.removeMatchedVertices(matching2);
 
-		System.out.println("Graph 3");
-		BipartiteGraph g3 = new BipartiteGraph(g);
+		System.out.println("Graph 3 again");
+		g3 = new BipartiteGraph(g);
 		this.constructSubgraph(g3, 3);
 		g3.print();
 
@@ -85,17 +152,6 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 		finalMatching.addAll(matching3);
 
 		g.removeMatchedVertices(matching3);
-
-		System.out.println("Graph 4");
-		BipartiteGraph g4 = new BipartiteGraph(g);
-		this.constructSubgraph(g4, 4);
-		g4.print();
-
-		ArrayList<ArrayList<Integer>> matching4 = g4.greedyMaximalMatching();
-		this.printMatching(matching4);
-		finalMatching.addAll(matching4);
-
-		g.removeMatchedVertices(matching4);
 
 		System.out.println("Remaining verts:");
 		g.print();
@@ -127,24 +183,26 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 
 	public void constructSubgraph(BipartiteGraph g, int graphNum)
 	{
-		for (int i = 0; i < this.n; i++) {
+		for (int i = 0; i < this.n * this.m; i++) {
 			//System.out.println(Arrays.toString(this.students[i].getInterests()));
 			//System.out.println(Arrays.toString(this.schools[i].getInterests()));
 			//System.out.println(Arrays.toString(this.schools[i].getAffiliateInterests()));
 
 			for (int j = 0; j < this.n; j++) {
+				int k = this.students[i].getSchool().getID();
+
 				switch (graphNum) {
 					case 0 :
-						if (i == j
+						if (this.schools[j].hasAffiliate(students[i])
 							&& this.students[i].checkAgent(j)
 					 		&& this.schools[j].checkAgent(i)
-				   	 		&& this.schools[j].checkSchool(j)) {
+				   	 		&& this.schools[j].checkSchool(j, i)) {
 							g.addEdge(i, j);
 							//System.out.println("(" + i + "," + j + ")" + " - " + 0);
 						}
 						break;
 					case 1 :
-						if (i != j
+						if ((!this.schools[j].hasAffiliate(students[i]))
 							&& this.students[i].checkAgent(j)
 							&& this.schools[j].checkAgent(i)) {
 							g.addEdge(i, j);
@@ -152,24 +210,28 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 						}
 						break;
 					case 2 :
-						if (i == j
+						if (this.schools[j].hasAffiliate(students[i])
 							&& this.students[i].checkAgent(j)
-							&& this.schools[j].checkAgent(i)) {
+							&& this.schools[j].checkAgent(i)
+							&& !this.schools[j].checkSchool(j, i)) {
 							g.addEdge(i, j);
 							//System.out.println("(" + i + "," + j + ")" + " - " + 2);
 						}
 						break;
 					case 3 :
-						if (i == j
+						if (this.schools[j].hasAffiliate(students[i])
 							&& this.students[i].checkAgent(j)
-							&& this.schools[j].checkSchool(j)) {
+							&& (!this.schools[j].checkAgent(i))
+							&& this.schools[j].checkSchool(j, i)) {
 							g.addEdge(i, j);
 							//System.out.println("(" + i + "," + j + ")" + " - " + 3);
 						}
 						break;
 					case 4 :
-						if (i != j
-							&& this.schools[i].checkSchool(j)) {
+						if ((!this.schools[j].hasAffiliate(students[i]))
+							&& this.schools[k].checkSchool(j, i)
+							&& ((!this.students[i].checkAgent(j))
+								|| !this.schools[j].checkAgent(i))) {
 							g.addEdge(i, j);
 							//System.out.println("(" + i + "," + j + ")" + " - " + 4);
 						}
@@ -272,6 +334,10 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
         size.setRequired(true);
         options.addOption(size);
 
+        Option affiliatesPerSchool = new Option("m", "affiliatesPerSchool", true, "the number of affiliates for each school");
+        affiliatesPerSchool.setRequired(true);
+        options.addOption(affiliatesPerSchool);
+
         Option students = new Option("s", "students", true, "student preferences input file");
         students.setRequired(false);
         options.addOption(students);
@@ -304,6 +370,7 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
         }
 
         int n = Integer.parseInt(cmd.getOptionValue("size"));
+		int m = Integer.parseInt(cmd.getOptionValue("affiliatesPerSchool"));
         String studentFile = cmd.getOptionValue("students");
         String schoolFile = cmd.getOptionValue("schools");
 		String affiliateFile = cmd.getOptionValue("affiliates");
@@ -311,14 +378,9 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
         if (cmd.hasOption("verify")) v = true;
         else v = false;
 
-        Abstract_BSM_Algorithm smp = new PriorityMatch(n, studentFile, schoolFile, affiliateFile);
+        Abstract_BSM_Algorithm smp = new PriorityMatch(n, m, studentFile, schoolFile, affiliateFile);
         Marriage matching = smp.match();
 
-		//Agent[][] agents = new Agent[1][n];
-		//for (int i = 0; i < n; i++) {
-		//	agents[0][i] = new Agent(n, i, 
-
-		//System.out.println(matching.marriageToStr());
         //Metrics smpMetrics = new Metrics(smp, matching, getFinalName());
         //if (v) smpMetrics.perform_checks();  
         //smpMetrics.printPerformance();

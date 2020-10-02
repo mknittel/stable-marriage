@@ -7,38 +7,41 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 import java.util.Random;
 
-import cslab.ntua.gr.entities.BinaryAgent;
+import cslab.ntua.gr.entities.Student;
 import cslab.ntua.gr.entities.School;
 import cslab.ntua.gr.entities.Marriage;
 
 public abstract class Abstract_BSM_Algorithm
 {
-	protected int n;
-	protected BinaryAgent[] students;
+	protected int n, m;
+	protected Student[] students;
 	protected School[] schools;
     protected long rounds;
     protected double time;
 
-	public Abstract_BSM_Algorithm(int n, BinaryAgent[] students, School[] schools)
+	public Abstract_BSM_Algorithm(int n, int m, Student[] students, School[] schools)
     {
         this.n = n;
+		this.m = m;
         this.rounds = 0;
         this.time = 0;
         this.students = students;
 		this.schools = schools;
     }
 
-    public Abstract_BSM_Algorithm(int n, String studentFile, String schoolFile, String affiliateFile)
+    public Abstract_BSM_Algorithm(int n, int m, String studentFile, String schoolFile, String affiliateFile)
     {
     	this.n = n;
+		this.m = m;
         rounds = 0;
         time = 0;
 
-		students = new BinaryAgent[n];
+		students = new Student[n*m];
 		schools = new School[n];
 
 		Random r = new Random();
@@ -54,11 +57,12 @@ public abstract class Abstract_BSM_Algorithm
         
         if (studentFile == null)
         {
-            for (i = 0; i < n; i++)
+            /*for (i = 0; i < n; i++)
             {
                 // New student with random threshold
-                students[i] = new BinaryAgent(n, i, 0, r.nextDouble());
-            }
+                students[i] = new Student(n, i, 0, 1, r.nextDouble());
+            }*/
+			;
         }
         else
         {
@@ -77,7 +81,7 @@ public abstract class Abstract_BSM_Algorithm
                     i = 0;
                     while ((sCurrentLine = br.readLine()) != null) 
                     {
-                        students[i] = new BinaryAgent(n, i, 0, sCurrentLine);
+                        students[i] = new Student(n, m, i, 0, sCurrentLine);
                         i++;
                     } 
                 }
@@ -111,7 +115,7 @@ public abstract class Abstract_BSM_Algorithm
                     i = 0;
                     while ((sCurrentLine = br.readLine()) != null) 
                     {
-                        students[i] = new BinaryAgent(n, i, 0, sCurrentLine);
+                        students[i] = new Student(n, m, i, 0, sCurrentLine);
                         i++;
                     }               
                 } 
@@ -137,11 +141,12 @@ public abstract class Abstract_BSM_Algorithm
 		// Assume we do random generation if either file is null
         if (schoolFile == null || affiliateFile == null)
         {
-            for (i = 0; i < n; i++)
+            /*for (i = 0; i < n; i++)
             {
                 // New school
                 schools[i] = new School(n, i, 1, r.nextDouble(), r.nextDouble());
-            }
+            }*/
+			;
         }
         else
         {
@@ -167,8 +172,11 @@ public abstract class Abstract_BSM_Algorithm
                     i = 0;
                     while ((sCurrentLine = br.readLine()) != null) 
                     {
-						sCurrentLine2 = br2.readLine();
-                        schools[i] = new School(n, i, 1, sCurrentLine, sCurrentLine2);
+						ArrayList<String> sCurrentLines2 = new ArrayList<String>();
+						for (int j = 0; j < m; j++) {
+							sCurrentLines2.add(br2.readLine());
+						}
+                        schools[i] = new School(n, m, i, 1, sCurrentLine, sCurrentLines2);
                         i++;
                     }  
                 }
@@ -207,8 +215,11 @@ public abstract class Abstract_BSM_Algorithm
                     i = 0;
                     while ((sCurrentLine = br.readLine()) != null) 
                     {
-						sCurrentLine2 = br2.readLine();
-                        schools[i] = new School(n, i, 1, sCurrentLine, sCurrentLine2);
+						ArrayList<String> sCurrentLines2 = new ArrayList<String>();
+						for (int j = 0; j < m; j++) {
+							sCurrentLines2.add(br2.readLine());
+						}
+                        schools[i] = new School(n, m, i, 1, sCurrentLine, sCurrentLines2);
                         i++;
                     }                
                 } 
@@ -232,6 +243,22 @@ public abstract class Abstract_BSM_Algorithm
                 }
             }
         }
+
+		int studentIndex = 0;
+		int schoolIndex = 0;
+
+		while (studentIndex < n * m) {
+			School school = this.schools[schoolIndex];
+			Student student = this.students[studentIndex];
+			school.addAffiliate(student);
+			student.setSchool(school);
+
+			studentIndex++;
+
+			if (studentIndex % m == 0) {
+				schoolIndex++;
+			}
+		}
     }
 
     public abstract Marriage match();
@@ -247,7 +274,7 @@ public abstract class Abstract_BSM_Algorithm
         return className;
     }
 
-    public BinaryAgent[] getStudents(){ return students; }
+    public Student[] getStudents(){ return students; }
     public School[] getSchools(){ return schools; }
     public int getSize(){ return n; }
     public long getRounds(){ return rounds; }

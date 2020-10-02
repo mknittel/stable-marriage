@@ -7,8 +7,8 @@ import java.util.Random;
 
 public class BinaryAgent
 {
-    private int n, side, id;
-    private int[] interestList;
+    private int n, m, side, id, capacity;
+    private ArrayList<Integer> interestList;
 
     // Creates a copy of an existing agent
     public BinaryAgent(BinaryAgent copy)
@@ -16,52 +16,41 @@ public class BinaryAgent
         this.n = copy.getN();
         this.id = copy.getID();
         this.side = copy.getSide();
+		this.capacity = copy.getCapacity();
 
-        interestList = new int[n];
-        int[] old_interestList = copy.getInterests();
-        for (int j = 0; j < n; j++) interestList[j] = old_interestList[j];
-    }
-
-    // Creates an agent with random preferences (uniform), number selected = threshold * n
-    public BinaryAgent(int n, int id, int side, double threshold)
-    {
-        this.n = n;
-        this.id = id;
-        this.side = side;
-
-		Random r = new Random();
-
-        interestList = new int[n];
-        for (int j = 0; j < n; j++) {
-			if (r.nextDouble() < threshold) {
-				interestList[j] = 1;
-			} else {
-				interestList[j] = 0;
-			}
-		}
+        interestList = new ArrayList<Integer>();
+        ArrayList<Integer> old_interestList = copy.getInterests();
+        for (int interest : old_interestList) interestList.add(interest);
     }
 
     // Creates an agent with preferences read from an input file
-    public BinaryAgent(int n, int id, int side, String lineWithPrefs)
+    public BinaryAgent(int n, int m, int id, int side, String lineWithPrefs)
     {
         this.n = n;
+		this.m = m;
         this.id = id;
         this.side = side;
 
-        interestList = new int[n];
+        interestList = new ArrayList<Integer>();
         String[] tokens = lineWithPrefs.split("\\s+");
-		System.out.println(Arrays.toString(tokens));
-        for (int j = 0; j < tokens.length; j++) interestList[j] = Integer.parseInt(tokens[j]);
+		
+		this.capacity = Integer.parseInt(tokens[0]);
+        for (int j = 1; j < tokens.length; j++) interestList.add(Integer.parseInt(tokens[j]));
     }
 
     public boolean checkAgent(int agentNo)
     {
-		return this.interestList[agentNo] == 1;
+		return this.interestList.get(agentNo) == 1;
     }
+
+	public void reduceCapacity() {
+		this.capacity--;
+	}
 
 
     public int getN(){ return n; }
     public int getID(){ return id; }
     public int getSide(){ return side; }
-    public int[] getInterests(){ return interestList; }
+    public int getCapacity(){ return capacity; }
+    public ArrayList<Integer> getInterests(){ return interestList; }
 }

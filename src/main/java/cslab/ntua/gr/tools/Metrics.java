@@ -172,6 +172,15 @@ public class Metrics
         System.out.print(" SexEqualityCost= " + this.sexEqualityCost());
         System.out.println(" RegretCost= " + this.regretCost()); 
     }
+	
+	public void printTime()
+	{
+		System.out.print(name + ":");
+        System.out.print(" Time= " + this.time + " secs");
+        System.out.print(" Rounds= " + this.rounds);
+        System.out.println(" Size= " + this.n);      
+	}
+		
 
     public void printPerformance()
     {
