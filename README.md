@@ -44,6 +44,12 @@ Novel algorithms implemented:
 
 Usage
 -----
+Download and set up Gurobi: [https://www.gurobi.com/downloads/?campaignid=193283256&adgroupid=78789908816&creative=384430929838&keyword=%2Bgurobi%20%2Bdownload&matchtype=b&gclid=CjwKCAjwq_D7BRADEiwAVMDdHrhhtMsHNaNPJrKWFGqkoPlszV8g3qOiXgFVlijOx07ptWQmx2tItRoC69wQAvD_BwE].
+
+Install your gurobi.jar file:
+```
+mvn install:install-file -Dfile=path/to/gurobi/jar/from/repository/gurobi.jar -DgroupId=gurobi -DartifactId=gurobi-jar -Dversion=7.5.1 -Dpackaging=jar
+```
 Clone from github and run:
 ```
 mvn package

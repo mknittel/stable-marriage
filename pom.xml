@@ -35,6 +35,13 @@
     <artifactId>commons-cli</artifactId>
     <version>1.4</version>
     </dependency>
+	<dependency>
+		<groupId>gurobi</groupId>
+		<artifactId>gurobi-jar</artifactId>
+		<version>7.5.1</version>
+		<!--systemPath>gurobi/gurobi.jar</systemPath-->
+		<!--<systemPath>../opt/gurobi903/linux64/lib/gurobi.jar</systemPath>-->
+	</dependency>
   </dependencies>
   <organization>
     <name>Computing Systems Laboratory, NTUA</name>
