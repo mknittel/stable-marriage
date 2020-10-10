@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.Math;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,10 @@ public abstract class Abstract_BSM_Algorithm
 	protected School[] schools;
     protected long rounds;
     protected double time;
+
+	protected double totalValue = 0;
+	protected double marketEquality = 0;
+	protected double balance = 0;
 
 	public Abstract_BSM_Algorithm(int n, int m, Student[] students, School[] schools)
     {
@@ -263,6 +268,63 @@ public abstract class Abstract_BSM_Algorithm
 
     public abstract Marriage match();
 
+	public void computeFairnessMetrics(ArrayList<ArrayList<Integer>> matching)
+	{
+		if (matching.size() == 0) return;
+
+		//ArrayList<Double> avgSchoolVals = new ArrayList<Double>();
+		//ArrayList<Double> avgStudentVals = new ArrayList<Double>();
+		ArrayList<Double> schoolDivisors = new ArrayList<Double>();
+		ArrayList<Double> studentDivisors = new ArrayList<Double>();
+
+		Double schoolVal = 0.0;
+		Double studentVal = 0.0;
+
+		for (int i = 0; i < this.n*this.m; i++) {
+			Student student = this.students[i];
+			studentDivisors.add(Double.valueOf(student.getCapacity()));
+
+			if (i < this.n) {
+				School school = this.schools[i];
+				double divisor = Double.valueOf(school.getCapacity());
+
+				for (Student student2 : school.getAffiliates()) {
+					divisor += student2.getCapacity();
+				}
+
+				schoolDivisors.add(divisor);
+			}
+		}
+
+		for (ArrayList<Integer> match : matching) {
+			int i = match.get(0);
+			int j = match.get(1);
+
+			School school = this.schools[i];
+			Student student = this.students[j];
+			School school2 = student.getSchool();
+
+			int k = school2.getID();
+
+			if (school.checkAgent(j)) {
+				schoolVal += 1.0 / schoolDivisors.get(i);
+			}
+
+			if (student.checkAgent(i)) {
+				studentVal += 1.0 / studentDivisors.get(j);
+			}
+
+			if (school2.checkSchool(school, student)) {
+				schoolVal += 1.0 / schoolDivisors.get(k);
+			}
+		}	
+
+
+		this.totalValue = schoolVal + studentVal;
+		this.marketEquality = Math.abs(schoolVal - studentVal);
+		this.balance = Math.min(schoolVal, studentVal);
+	}
+
     public int flip(int side)
     {
         return side^1;
@@ -279,4 +341,7 @@ public abstract class Abstract_BSM_Algorithm
     public int getSize(){ return n; }
     public long getRounds(){ return rounds; }
     public double getTime(){ return time; }
+	public double getTotalValue(){ return totalValue; }
+	public double getMarketEquality(){ return marketEquality; }
+	public double getBalance(){ return balance; }
 }

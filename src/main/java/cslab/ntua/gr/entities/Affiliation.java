@@ -13,7 +13,7 @@ public class Affiliation
 
 	public Affiliation(int id, School school, ArrayList<Student> students) {
 		this.id = id;
-		this.reservation = 1;
+		this.reservation = students.size();
 		this.numMatched = 0;
 		this.school = school;
 
@@ -48,6 +48,17 @@ public class Affiliation
 		
 		for (Student student: a.getStudents()) {
 			this.students.add(student);
+		}
+	}
+
+	public void addAffiliate(Student student)
+	{
+		if (!this.students.contains(student)) {
+			this.students.add(student);
+			
+			if (this.reservation < school.getCapacity()) {
+				this.reservation++;
+			}
 		}
 	}
 

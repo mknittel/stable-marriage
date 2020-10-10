@@ -25,28 +25,33 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
     private int[][] married;
     private Stack<Integer> singles;
     private int active_proposer;
+	private boolean debug;
 
-    public PriorityMatch(int n, int m, String studentFile, String schoolFile, String affiliateFile)
+    public PriorityMatch(int n, int m, String studentFile, String schoolFile, String affiliateFile, boolean debug)
     {
         super(n, m, studentFile, schoolFile, affiliateFile);
+		this.debug = debug;
     }
 
     // Constructor for when agents are available
     public PriorityMatch(int n, int m, Student[] students, School[] schools)
     {
         super(n, m, students, schools);
+		this.debug = debug;
     }
 	
 	public Marriage match()
 	{
+		long startTime = System.nanoTime();
+
 		BipartiteGraph g = new BipartiteGraph(this.students, this.schools); // base graph, we remove vertices as they are matched
 
 		ArrayList<ArrayList<Integer>> finalMatching = new ArrayList<ArrayList<Integer>>();
 
-		System.out.println("Graph 0");
+		if (this.debug) System.out.println("Graph 0");
 		BipartiteGraph g0 = new BipartiteGraph(g);
 		this.constructSubgraph(g0, 0);
-		g0.print();
+		if (this.debug) g0.print();
 
 		HashMap<Integer, ArrayList<ArrayList<Student>>> neighborhoods = new HashMap<Integer, ArrayList<ArrayList<Student>>>();
 
@@ -62,22 +67,22 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 
 		//g.removeMatchedVertices(matching0);
 
-		System.out.println("Graph 1");
+		if (this.debug) System.out.println("Graph 1");
 		BipartiteGraph g1 = new BipartiteGraph(g);
 		this.constructSubgraph(g1, 1);
 		g1.addAffiliations(neighborhoods);
-		g1.print();
+		if (this.debug) g1.print();
 
 		ArrayList<ArrayList<Integer>> matching1 = g1.greedyReservedMaximalMatching();
-		this.printMatching(matching1);
+		if (this.debug) this.printMatching(matching1);
 		finalMatching.addAll(matching1);
 
 		g.removeMatchedVertices(matching1);
 
-		System.out.println("Graph 2");
+		if (this.debug) System.out.println("Graph 2");
 		BipartiteGraph g2 = new BipartiteGraph(g);
 		this.constructSubgraph(g2, 2);
-		g2.print();
+		if (this.debug) g2.print();
 
 		for (School school : g2.getSchools()) {
 			int schoolID = school.getID();
@@ -91,10 +96,10 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 
 		//g.removeMatchedVertices(matching2);
 
-		System.out.println("Graph 3");
+		if (this.debug) System.out.println("Graph 3");
 		BipartiteGraph g3 = new BipartiteGraph(g);
 		this.constructSubgraph(g3, 3);
-		g3.print();
+		if (this.debug) g3.print();
 
 		for (School school : g3.getSchools()) {
 			int schoolID = school.getID();
@@ -108,63 +113,77 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 
 		//g.removeMatchedVertices(matching3);
 
-		System.out.println("Graph 4");
+		if (this.debug) System.out.println("Graph 4");
 		BipartiteGraph g4 = new BipartiteGraph(g);
 		this.constructSubgraph(g4, 4);
 		g4.addAffiliations(neighborhoods);
-		g4.print();
+		if (this.debug) g4.print();
 
 		ArrayList<ArrayList<Integer>> matching4 = g4.greedyReservedMaximalMatching();
-		this.printMatching(matching4);
+		if (this.debug) this.printMatching(matching4);
 		finalMatching.addAll(matching4);
 
 		g.removeMatchedVertices(matching4);
 
-		System.out.println("Graph 0 again");
+		if (this.debug) System.out.println("Graph 0 again");
 		g0 = new BipartiteGraph(g);
 		this.constructSubgraph(g0, 0);
-		g0.print();
+		if (this.debug) g0.print();
 		
 		ArrayList<ArrayList<Integer>> matching0 = g0.greedyMaximalMatching();
-		this.printMatching(matching0);
+		if (this.debug) this.printMatching(matching0);
 		finalMatching.addAll(matching0);
 
 		g.removeMatchedVertices(matching0);
 
-		System.out.println("Graph 2 again");
+		if (this.debug) System.out.println("Graph 2 again");
 		g2 = new BipartiteGraph(g);
 		this.constructSubgraph(g2, 2);
-		g2.print();
+		if (this.debug) g2.print();
 
 		ArrayList<ArrayList<Integer>> matching2 = g2.greedyMaximalMatching();
-		this.printMatching(matching2);
+		if (this.debug) this.printMatching(matching2);
 		finalMatching.addAll(matching2);
 
 		g.removeMatchedVertices(matching2);
 
-		System.out.println("Graph 3 again");
+		if (this.debug) System.out.println("Graph 3 again");
 		g3 = new BipartiteGraph(g);
 		this.constructSubgraph(g3, 3);
-		g3.print();
+		if (this.debug) g3.print();
 
 		ArrayList<ArrayList<Integer>> matching3 = g3.greedyMaximalMatching();
-		this.printMatching(matching3);
+		if (this.debug) this.printMatching(matching3);
 		finalMatching.addAll(matching3);
 
 		g.removeMatchedVertices(matching3);
 
-		System.out.println("Remaining verts:");
-		g.print();
+		if (this.debug) System.out.println("Remaining verts:");
+		if (this.debug) g.print();
 
-		System.out.println("Final matching:");
-		this.printMatching(finalMatching);
+		if (this.debug) System.out.println("Final matching:");
+		if (this.debug) this.printMatching(finalMatching);
+
+		for (int i = 0; i < finalMatching.size(); i++) {
+			int a = finalMatching.get(i).get(0);
+			int b = finalMatching.get(i).get(1);
+
+			finalMatching.get(i).set(0, b);
+			finalMatching.get(i).set(1, a);
+		}
 
 		int[][] matching = new int[finalMatching.size()][2];
 		for (int i = 0; i < finalMatching.size(); i++) {
 			matching[i][0] = finalMatching.get(i).get(0);
 			matching[i][1] = finalMatching.get(i).get(1);
-			System.out.println("Matching " + matching[i][0] + " with " + matching[i][1]);
+			if (this.debug) System.out.println("Matching " + matching[i][0] + " with " + matching[i][1]);
 		}
+
+		long endTime = System.nanoTime();
+		long elapsedTime = endTime - startTime;
+		time = elapsedTime / 1.0E09;
+
+		this.computeFairnessMetrics(finalMatching);
 
 		return new Marriage(this.n, matching);
 	}
@@ -243,87 +262,11 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
 		}
 	}
 
-
-
-    /*public Marriage match()
-    {
-        long startTime = System.nanoTime();
-
-        // Initialize
-        kappa = new int[n];
-        married = new int[2][n];  
-        for (int i = 0; i < n; i++)
-        {
-            married[0][i] = Integer.MAX_VALUE;
-            married[1][i] = Integer.MAX_VALUE;
-        } 
-        singles = new Stack<Integer>();
-        for (int i = 0; i < n; i++) singles.push(i); 
-
-        active_proposer = singles.pop();
-        // Propose
-        while (true)
-        {
-            propose(active_proposer);
-            if (active_proposer == -1)
-            {
-                if (singles.isEmpty()) break;
-                else active_proposer = singles.pop();
-            }
-        }
-
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
-        time = elapsedTime / 1.0E09;
-
-        Marriage result = new Marriage(n, married);
-        return result;
-    }
-
-    // Returns true if a proposal was issued, false otherwise
-    private void propose(int proposer)
-    {
-        int proposeToIndex = kappa[proposer];
-        if (married[1][proposer] == Integer.MAX_VALUE)
-        {
-            // Wants to propose
-            int acceptor = agents[1][proposer].getAgentAt(proposeToIndex);
-            if (evaluate(acceptor, proposer)) married[1][proposer] = proposeToIndex;
-            else kappa[proposer]++;
-        }
-    }
-
-    // Returns true if acceptor agrees to marry proposer
-    private boolean evaluate(int acceptor, int proposer)
-    {
-        int proposerRank = agents[0][acceptor].getRankOf(proposer);
-        int marriedToIndex = married[0][acceptor];
-        if (marriedToIndex > proposerRank)
-        {
-            // Break up with old
-            if (marriedToIndex != Integer.MAX_VALUE)
-            {
-                int old = agents[0][acceptor].getAgentAt(marriedToIndex);
-                married[1][old] = Integer.MAX_VALUE;                
-                active_proposer = old;            
-            }
-            else
-            {
-                active_proposer = -1;
-            }             
-            //Engage with new
-            married[0][acceptor] = proposerRank;            
-            return true;
-        }
-        else return false;
-    }
-
     private static String getFinalName()
     {
         String className = getName();
         return className.substring(className.lastIndexOf('.') + 1);
     }  
-	*/  
     
     public static void main(String args[]) 
     {
@@ -378,11 +321,13 @@ public class PriorityMatch extends Abstract_BSM_Algorithm
         if (cmd.hasOption("verify")) v = true;
         else v = false;
 
-        Abstract_BSM_Algorithm smp = new PriorityMatch(n, m, studentFile, schoolFile, affiliateFile);
+		boolean debug = false;
+
+        Abstract_BSM_Algorithm smp = new PriorityMatch(n, m, studentFile, schoolFile, affiliateFile, debug);
         Marriage matching = smp.match();
 
-        //Metrics smpMetrics = new Metrics(smp, matching, getFinalName());
+        Metrics smpMetrics = new Metrics(smp, matching, getFinalName());
         //if (v) smpMetrics.perform_checks();  
-        //smpMetrics.printPerformance();
+        smpMetrics.printBinaryPerformance();
     }
 }

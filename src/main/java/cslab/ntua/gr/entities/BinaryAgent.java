@@ -10,6 +10,8 @@ public class BinaryAgent
     private int n, m, side, id, capacity;
     private ArrayList<Integer> interestList;
 
+	public BinaryAgent() { }
+
     // Creates a copy of an existing agent
     public BinaryAgent(BinaryAgent copy)
     {
@@ -37,9 +39,20 @@ public class BinaryAgent
 		this.capacity = Integer.parseInt(tokens[0]);
         for (int j = 1; j < tokens.length; j++) interestList.add(Integer.parseInt(tokens[j]));
     }
+	
+	public void setCapacity(int cap)
+	{
+		this.capacity = cap;
+	}
 
     public boolean checkAgent(int agentNo)
     {
+		return this.interestList.get(agentNo) == 1;
+    }
+
+	public boolean checkAgent(BinaryAgent agent)
+	{
+		int agentNo = agent.getID();
 		return this.interestList.get(agentNo) == 1;
     }
 

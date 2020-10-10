@@ -12,6 +12,8 @@ public class School extends BinaryAgent
     private HashMap<Integer, ArrayList<Integer>> affiliateInterestList;
 	private ArrayList<Student> affiliates;
 
+	public School() { }
+
     // Creates a copy of an existing agent
     public School(School copy)
     {
@@ -66,6 +68,14 @@ public class School extends BinaryAgent
 
     public boolean checkSchool(int schoolNo, int affiliateNo)
     {	
+		return this.affiliateInterestList.get(affiliateNo).get(schoolNo) == 1;
+    }
+
+    public boolean checkSchool(School school, Student student)
+    {	
+		int schoolNo = school.getID();
+		int affiliateNo = student.getID();
+
 		return this.affiliateInterestList.get(affiliateNo).get(schoolNo) == 1;
     }
 

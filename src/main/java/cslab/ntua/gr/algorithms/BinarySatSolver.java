@@ -39,6 +39,7 @@ public class BinarySatSolver extends Abstract_BSM_Algorithm
 	
 	public Marriage match()
 	{
+		return new Marriage(this.n, new int[n][2]);
 	}
 
 	public void printMatching(ArrayList<ArrayList<Integer>> matching)

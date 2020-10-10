@@ -10,6 +10,8 @@ public class Student extends BinaryAgent
 {
 	private School school;
 
+	public Student() { }
+
     // Creates a copy of an existing agent
     public Student(Student copy)
     {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cslab.ntua.gr.algorithms.Abstract_SM_Algorithm;
+import cslab.ntua.gr.algorithms.Abstract_BSM_Algorithm;
 import cslab.ntua.gr.entities.Agent;
 import cslab.ntua.gr.entities.Marriage;
 
@@ -15,6 +16,9 @@ public class Metrics
     private String name;
     private long rounds;
     private double time;
+	private double totalValue;
+	private double marketEquality;
+	private double balance;
 
     public Metrics(Abstract_SM_Algorithm instance, Marriage m, String name)
     {
@@ -24,6 +28,18 @@ public class Metrics
         this.time = instance.getTime();
         this.matching = m;
         this.name = name;
+    }
+
+    public Metrics(Abstract_BSM_Algorithm instance, Marriage m, String name)
+    {
+    	this.n = instance.getSize();
+        this.rounds = instance.getRounds();
+        this.time = instance.getTime();
+        this.matching = m;
+        this.name = name;
+		this.totalValue = instance.getTotalValue();
+		this.marketEquality = instance.getMarketEquality();
+		this.balance = instance.getBalance();
     }
 
     private int matchOf(int man)
@@ -181,6 +197,15 @@ public class Metrics
         System.out.println(" Size= " + this.n);      
 	}
 		
+	public void printBinaryPerformance()
+	{
+		System.out.print(name + ":");
+        System.out.print(" Time= " + this.time + " secs");
+        System.out.print(" TotalValue = " + this.totalValue);
+        System.out.print(" MarketEquality = " + this.marketEquality);
+        System.out.print(" Balance = " + this.balance);
+        System.out.println(" Size= " + this.n);      
+	}
 
     public void printPerformance()
     {

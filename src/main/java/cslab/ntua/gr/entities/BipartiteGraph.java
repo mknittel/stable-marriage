@@ -381,7 +381,7 @@ public class BipartiteGraph
 	public void removeMatch(int a, int b) {
 		Student student = studentIDs.get(a);
 		School school = schoolIDs.get(b);
-		System.out.println("reducing: " + a + " and " + b);
+		//System.out.println("reducing: " + a + " and " + b);
 
 		student.reduceCapacity();
 		school.reduceCapacity();

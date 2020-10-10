@@ -104,9 +104,6 @@ public class BinaryUniformDataGenerator extends BinaryDataGenerator
 		String schoolFileName = cmd.getOptionValue("schoolFile");
 		String affiliateFileName = cmd.getOptionValue("affiliateFile");
 
-		System.out.println("n: " + n + ", m: " + m + ", t: " + t + ", c: " + c);
-			
-
 		BinaryDataGenerator gen = new BinaryUniformDataGenerator(n, m, t, c);
 		gen.setOutputFiles(studentFileName, schoolFileName, affiliateFileName);
 		gen.create("student");
