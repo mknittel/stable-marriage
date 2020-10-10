@@ -62,30 +62,30 @@ mvn package
 ```
 To reproduce the small-scale PriorityMatch vs ILP experiments:
 ```
-bash create\_binary\_data.sh _(from scripts/)_
-bash run.sh _(from scripts/Experiment\_Binary/)_
-python3 plot.py _(from scripts/Experiment\_Binary/)_
+bash create_binary_data.sh (from scripts/)
+bash run.sh (from scripts/Experiment_Binary/)
+python3 plot.py (from scripts/Experiment_Binary/)
 
 ```
 To reproduce the large-scale PriorityMatch experiments (varying n):
 ```
-bash create\_binary\_n\_data.sh _(from scripts/)_
-bash run.sh _(from scripts/Experiment\_Binary\_n/)_
-python3 plot.py _(from scripts/Experiment\_Binary\_n/)_
+bash create_binary_n_data.sh (from scripts/)
+bash run.sh (from scripts/Experiment_Binary_n/)
+python3 plot.py (from scripts/Experiment_Binary_n/)
 ```
 
 To reproduce the quota-varying PriorityMatch experiments:
 ```
-bash create\_binary\_cap\_data.sh _(from scripts/)_
-bash run.sh _(from scripts/Experiment\_Binary\_Cap/)_
-python3 plot.py _(from scripts/Experiment\_Binary\_Cap/)_
+bash create_binary_cap_data.sh (from scripts/)
+bash run.sh (from scripts/Experiment_Binary_Cap/)
+python3 plot.py (from scripts/Experiment_Binary_Cap/)
 ```
 
 To reproduce the affiliates-per-employer-varying PriorityMatch experiments:
 ```
-bash create\_binary\_aff\_data.sh _(from scripts/)_
-bash run.sh _(from scripts/Experiment\_Binary\_Aff/)_
-python3 plot.py _(from scripts/Experiment\_Binary\_Aff/)_
+bash create_binary_aff_data.sh (from scripts/)
+bash run.sh (from scripts/Experiment_Binary_Aff/)
+python3 plot.py (from scripts/Experiment_Binary_Aff/)
 ```
 
 To reproduce the threshold-varying PriorityMatch experiments:
