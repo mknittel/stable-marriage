@@ -1,9 +1,15 @@
 Details
 -------
-Implementation of algorithms that solve the stable marriage problem. 
+Implementation of algorithms that solve the stable marriage problem and the binary affiliate matching problem. 
 (https://en.wikipedia.org/wiki/Stable_marriage_problem)
 
-Algorithms implemented from the literature:
+Code has been adapted from the ntzia stable-marriage repo (https://github.com/ntzia/stable-marriage), used in "Equitable Stable Matchings in Quadratic Time" (https://papers.nips.cc/paper/8337-equitable-stable-matchings-in-quadratic-time).
+
+Binary affiliate matching problem algorithms:
+* ILP: a standard integer linear program to solve BAM
+* PriorityMatch: an implementation of our proposed PriorityMatch algorithm (specifically, the SmartPriorityMatch implementation)
+
+Stable marriage algorithms implemented from the literature:
 * Gale-Shapley  
 [https://www.researchgate.net/publication/228108175_College_Admissions_and_Stability_of_Marriage]
 	* GS_MaleOpt produces the optimal solution for men
@@ -35,7 +41,7 @@ Algorithms implemented from the literature:
 * Better/Best Response Dynamics  
 [https://dl.acm.org/citation.cfm?id=1386831]
 
-Novel algorithms implemented:
+Stable Marriage algorithms from previous work:
 * PDB, EDS, LDS: proposal-based approaches that terminate by monotonically increasing content couples
 * PowerBalance: proposal-based algorithm that tries to keep a good balance between both sides and then terminates by a compromising procedure
 * Hybrid, HybridMultiSearch: combinations of PowerBalance with the local search method
@@ -44,33 +50,48 @@ Novel algorithms implemented:
 
 Usage
 -----
-Download and set up Gurobi: [https://www.gurobi.com/downloads/?campaignid=193283256&adgroupid=78789908816&creative=384430929838&keyword=%2Bgurobi%20%2Bdownload&matchtype=b&gclid=CjwKCAjwq_D7BRADEiwAVMDdHrhhtMsHNaNPJrKWFGqkoPlszV8g3qOiXgFVlijOx07ptWQmx2tItRoC69wQAvD_BwE].
-
-Install your gurobi.jar file:
+Clone from github
+```
+Install your gurobi.jar file with maven in the repo directory:
 ```
 mvn install:install-file -Dfile=path/to/gurobi/jar/from/repository/gurobi.jar -DgroupId=gurobi -DartifactId=gurobi-jar -Dversion=7.5.1 -Dpackaging=jar
 ```
-Clone from github and run:
+Run:
 ```
 mvn package
 ```
-To run an algorithm with random input (uniform lists) you can execute the following classes from the produced jar:
+To reproduce the small-scale PriorityMatch vs ILP experiments:
+bash create\_binary\_data.sh _(from scripts/)_
+bash run.sh _(from scripts/Experiment\_Binary/)_
+python3 plot.py _(from scripts/Experiment\_Binary/)_
 
-*gr.ntua.cslab.algorithms.(algorithm)*
+To reproduce the large-scale PriorityMatch experiments (varying n):
+bash create\_binary\_n\_data.sh _(from scripts/)_
+bash run.sh _(from scripts/Experiment\_Binary\_n/)_
+python3 plot.py _(from scripts/Experiment\_Binary\_n/)_
 
-OR
+To reproduce the quota-varying PriorityMatch experiments:
+bash create\_binary\_cap\_data.sh _(from scripts/)_
+bash run.sh _(from scripts/Experiment\_Binary\_Cap/)_
+python3 plot.py _(from scripts/Experiment\_Binary\_Cap/)_
 
-Run experiments for diverse distributions and plot results:
-* Create datasets (*create_data.sh*)
-* Run (*run_experiments.sh*)
-* Plot (*do_plots.sh*)
+To reproduce the affiliates-per-employer-varying PriorityMatch experiments:
+bash create\_binary\_aff\_data.sh _(from scripts/)_
+bash run.sh _(from scripts/Experiment\_Binary\_Aff/)_
+python3 plot.py _(from scripts/Experiment\_Binary\_Aff/)_
 
-There is also the option to produce and run zipped input files to save space.
+To reproduce the threshold-varying PriorityMatch experiments:
+bash create\_binary\_thresh\_data.sh _(from scripts/)_
+bash run.sh _(from scripts/Experiment\_Binary\_Thresh/)_
+python3 plot.py _(from scripts/Experiment\_Binary\_Thresh/)_
+
+Note: creating data cleans out all old data from all previous experiments. However, experiment results are kept until that specific experiment is run again.
 
 Dependencies
 -----
-You need maven to build the project:
-* sudo apt-get install maven
+You need maven and gurobi to build the project:
+* Maven: sudo apt-get install maven
+* Gurobi: https://www.gurobi.com/ (either use a free trial or get an academic license)
 
 For the plotting scripts you need:
 
@@ -81,7 +102,3 @@ For the plotting scripts you need:
 * sudo apt-get install texlive-full
 
 Tested on Ubuntu 18.04.
-
-Contact
--------
-Nikos Tziavelis, ntziavelis@gmail.com
