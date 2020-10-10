@@ -51,7 +51,7 @@ Stable Marriage algorithms from previous work:
 Usage
 -----
 Clone from github
-```
+
 Install your gurobi.jar file with maven in the repo directory:
 ```
 mvn install:install-file -Dfile=path/to/gurobi/jar/from/repository/gurobi.jar -DgroupId=gurobi -DartifactId=gurobi-jar -Dversion=7.5.1 -Dpackaging=jar
@@ -61,29 +61,39 @@ Run:
 mvn package
 ```
 To reproduce the small-scale PriorityMatch vs ILP experiments:
+```
 bash create\_binary\_data.sh _(from scripts/)_
 bash run.sh _(from scripts/Experiment\_Binary/)_
 python3 plot.py _(from scripts/Experiment\_Binary/)_
 
+```
 To reproduce the large-scale PriorityMatch experiments (varying n):
+```
 bash create\_binary\_n\_data.sh _(from scripts/)_
 bash run.sh _(from scripts/Experiment\_Binary\_n/)_
 python3 plot.py _(from scripts/Experiment\_Binary\_n/)_
+```
 
 To reproduce the quota-varying PriorityMatch experiments:
+```
 bash create\_binary\_cap\_data.sh _(from scripts/)_
 bash run.sh _(from scripts/Experiment\_Binary\_Cap/)_
 python3 plot.py _(from scripts/Experiment\_Binary\_Cap/)_
+```
 
 To reproduce the affiliates-per-employer-varying PriorityMatch experiments:
+```
 bash create\_binary\_aff\_data.sh _(from scripts/)_
 bash run.sh _(from scripts/Experiment\_Binary\_Aff/)_
 python3 plot.py _(from scripts/Experiment\_Binary\_Aff/)_
+```
 
 To reproduce the threshold-varying PriorityMatch experiments:
+```
 bash create\_binary\_thresh\_data.sh _(from scripts/)_
 bash run.sh _(from scripts/Experiment\_Binary\_Thresh/)_
 python3 plot.py _(from scripts/Experiment\_Binary\_Thresh/)_
+```
 
 Note: creating data cleans out all old data from all previous experiments. However, experiment results are kept until that specific experiment is run again.
 
